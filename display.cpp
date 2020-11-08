@@ -7,8 +7,10 @@
 #endif
 #include <iostream>
 #include "stb_image.h"
+#include "Mouse.h"
 
-Display::Display(int width, int height, const std::string &title)
+Display::Display(int width, int height, const std::string &title) : m_height(height),
+                                                                    m_width(width)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -58,11 +60,30 @@ void Display::Update()
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_QUIT)
+        switch (e.type)
         {
+        case SDL_QUIT:
             m_isClosed = true;
+            break;
+        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            Mouse::get()->setEvent(&e);
+            break;
+        default:
+            break;
         }
     }
+}
+
+int Display::Height()
+{
+    return m_width;
+}
+
+int Display::Width()
+{
+    return m_height;
 }
 
 bool Display::isClosed()

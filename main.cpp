@@ -82,8 +82,7 @@ int main(int argc, char *argv[]) {
     // Mesh mesh(vertices, sizeof(vertices)/sizeof(vertices[0]));
     // Texture tex("./res/my.jpg");
     Transform transform;
-    Camera camera(glm::vec3(16, 46, 4), 70.0f, 800.0f/600.0f, 0.01f, 100.0f);
-    // Camera camera(glm::vec3(0, 0, 4), 70.0f, 800.0f/600.0f, 0.01f, 100.0f);
+    Camera camera(&dis, glm::vec3(16, 46, 4), 0.01, 100.0);
 
     float counter = 0.0f;
     transform.GetScale() = glm::vec3(1, 1, 1);

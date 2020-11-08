@@ -3,14 +3,14 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "display.h"
 
 struct Camera
 {
 public:
-    Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar) {
-        // m_perspective = glm::perspective(fov, aspect, zNear, zFar);
-        // m_perspective = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, zNear, zFar);
-        m_perspective = glm::ortho(-800.0f/800, 800.0f/800, -600.0f/800, 600.0f/800, zNear, zFar);
+    Camera(Display* dis, glm::vec3 pos, double zNear, double zFar) {
+        double aspectRatio = (1.0 * dis->Width()) / dis->Height();
+        m_perspective = glm::ortho(-1.0, 1.0, -1.0, 1.0, zNear, zFar);
         m_position = pos;
         m_forward = glm::vec3(0, 0, -1);
         m_up = glm::vec3(0, 1, 0);
