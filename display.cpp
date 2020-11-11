@@ -22,8 +22,11 @@ Display::Display(int width, int height, const std::string &title) : m_height(hei
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     m_glContext = SDL_GL_CreateContext(m_window);
+    SDL_GL_GetDrawableSize(m_window, &m_width, &m_height);
+
+    std::cout << "width: " << m_width << " height: " << m_height << std::endl;
 
 #ifndef __APPLE__
     if (glewInit() != GLEW_OK)
@@ -78,12 +81,16 @@ void Display::Update()
 
 int Display::Height()
 {
-    return m_width;
+    return m_height;
 }
 
 int Display::Width()
 {
-    return m_height;
+    return m_width;
+}
+
+double Display::AspectRatio() {
+    return (1.0 * m_width) / (1.0 * m_height);
 }
 
 bool Display::isClosed()

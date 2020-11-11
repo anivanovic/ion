@@ -20,21 +20,25 @@ Mouse* Mouse::get()
 void Mouse::setEvent(SDL_Event* event) {
     m_event = event;
     if (m_event->type == SDL_MOUSEMOTION) {
-        int x = event->motion.xrel;
-        int y = event->motion.yrel;
-        std::cout << "mouse x: " << x << ", y: " << y << std::endl;
+        _x = event->motion.xrel * 1.0;
+        _y = event->motion.yrel * 1.0;
+        // std::cout << "x: " << _x << ", y: " << _y << std::endl;
+        // std::cout << "pos x: " << m_event->motion.x << ", y: " << m_event->motion.y << std::endl;
     } else {
         if (m_event->button.button != SDL_BUTTON_LEFT) {
+
             std::cout << "not left button " << std::endl;
             return;
         }
 
         if (m_event->type == SDL_MOUSEBUTTONDOWN) {
-            std::cout << "active " << std::endl;
             m_active = true;
         } else if (m_event->type == SDL_MOUSEBUTTONUP) {
-            std::cout << "disabled " << std::endl;
             m_active = false;
         }
     }
+}
+
+glm::vec3 Mouse::getMove() {
+    return glm::vec3(-_x/100, _y/100, 0.0);
 }

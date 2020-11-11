@@ -4,13 +4,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include "display.h"
+#include <iostream>
 
 struct Camera
 {
 public:
     Camera(Display* dis, glm::vec3 pos, double zNear, double zFar) {
-        double aspectRatio = (1.0 * dis->Width()) / dis->Height();
-        m_perspective = glm::ortho(-1.0, 1.0, -1.0, 1.0, zNear, zFar);
+        double aspectRatio = dis->AspectRatio();
+        std::cout << "w: " << dis->Width() << "h: " << dis->Height() <<std::endl;
+        std::cout << "aspect ration: " << aspectRatio << std::endl;
+        m_perspective = glm::ortho(-aspectRatio, aspectRatio, -1.0, 1.0, zNear, zFar);
         m_position = pos;
         m_forward = glm::vec3(0, 0, -1);
         m_up = glm::vec3(0, 1, 0);
@@ -18,6 +21,10 @@ public:
 
     inline glm::mat4 GetCameraProj() const {
         return m_perspective * glm::lookAt(m_position, m_position + m_forward, m_up);
+    }
+
+    void move(glm::vec3 move) {
+        m_position = m_position + move;
     }
 
 private:

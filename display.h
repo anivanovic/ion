@@ -14,6 +14,7 @@ public:
     bool isClosed();
 	int Height();
 	int Width();
+	double AspectRatio();
 
 	virtual ~Display();
 protected:
