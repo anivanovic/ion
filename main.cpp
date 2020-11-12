@@ -84,14 +84,14 @@ int main(int argc, char *argv[]) {
     while(!dis.isClosed()) {
         dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // transform.GetPos().x = sinf(counter);
-        // transform.GetRot().z = counter;
-        // transform.GetScale() = (transform.GetScale() / transform.GetScale()) * cosf(counter);
-
         shader.Bind();
         // tex.Bind(0);
         if (Mouse::get()->isActive()) {
+            // TODO put in method code to converting to world coord
             glm::vec3 change = Mouse::get()->getMove();
+            double xDelta = 2.0/800.0;
+            double yDelta = 2.0/600.0;
+            change = glm::vec3(-xDelta, yDelta, 0) * change;
             camera.move(change);
         }
         shader.UpdateTransform(transform, camera);

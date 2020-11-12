@@ -40,5 +40,5 @@ void Mouse::setEvent(SDL_Event* event) {
 }
 
 glm::vec3 Mouse::getMove() {
-    return glm::vec3(-_x/100, _y/100, 0.0);
+    return glm::vec3(_x, _y, 0.0);
 }
