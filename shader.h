@@ -18,8 +18,6 @@ public:
     std::string LoadShader(const std::string& file_name);
     GLuint CreateShader(const std::string& text, unsigned int type);
 private:
-    // static const unsigned int NUM_SHADERS = 2;
-    static const unsigned int NUM_SHADERS = 1;
     Shader(const Shader& other) {}
     void operator=(const Shader& other) {}
 
@@ -29,7 +27,7 @@ private:
     };
 
     GLuint m_program;
-    GLuint m_shaders[NUM_SHADERS];
+    GLuint m_shaders[2];
     GLuint m_uniforms[NUM_UNIFORMS];
 };
 

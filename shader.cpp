@@ -6,11 +6,10 @@ Shader::Shader(const std::string& file_name)
 {
     m_program = glCreateProgram();
     m_shaders[0] = CreateShader(LoadShader(file_name + ".vs"), GL_VERTEX_SHADER);
-    // m_shaders[1] = CreateShader(LoadShader(file_name + ".fs"), GL_FRAGMENT_SHADER);
+    m_shaders[1] = CreateShader(LoadShader(file_name + ".fs"), GL_FRAGMENT_SHADER);
 
-    for ( unsigned int i = 0; i < NUM_SHADERS; i++) {
-        glAttachShader(m_program, m_shaders[i]);
-    }
+    glAttachShader(m_program, m_shaders[0]);
+    glAttachShader(m_program, m_shaders[1]);
 
     glBindAttribLocation(m_program, 0, "position");
     glBindAttribLocation(m_program, 1, "texCoor");
@@ -21,14 +20,12 @@ Shader::Shader(const std::string& file_name)
     CheckShaderError(m_program, GL_VALIDATE_STATUS, true, "Program failed to validate");
 
     m_uniforms[TRANSFORM_U] = glGetUniformLocation(m_program, "transform");
+    glDeleteShader(m_shaders[0]);
+    glDeleteShader(m_shaders[1]);
 }
 
 Shader::~Shader()
 {
-    for ( unsigned int i = 0; i < NUM_SHADERS; i++) {
-        glDetachShader(m_program, m_shaders[i]);
-        glDeleteShader(m_shaders[i]);
-    }
     glDeleteProgram(m_program);
 }
 
@@ -38,7 +35,6 @@ void Shader::Bind() {
 
 void Shader::UpdateTransform(const Transform& transform, const Camera& camera) {
 	glm::mat4 model = camera.GetCameraProj() * transform.GetModel();
-
 	glUniformMatrix4fv(m_uniforms[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 }
 
