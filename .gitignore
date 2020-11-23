@@ -1,3 +1,4 @@
-main
+quant
 res
 .vscode
+*.o
