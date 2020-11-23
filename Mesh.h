@@ -20,8 +20,7 @@ private:
 
 class Mesh {
 public:
-    Mesh(const std::string& fileName);
-	Mesh(Vertex* vertices, unsigned int numVertices);
+	Mesh(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices, GLenum mode);
 
 	void Draw();
 
@@ -34,12 +33,14 @@ private:
     enum {
         POSITION_VB,
         // TEX_COORD_VB,
-        NUM_BUFFERS
+        INDEX_VB,
+        NUM_BUFFERS,
     };
 
-    GLuint m_vertexArrayObject;
-    GLuint m_vertexArrayBuffer[NUM_BUFFERS];
+    GLuint m_VAO;
+    GLuint m_VBO[NUM_BUFFERS];
     unsigned int m_drawCount;
+    GLenum m_mode;
 };
 
 #endif
