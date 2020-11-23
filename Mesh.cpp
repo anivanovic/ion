@@ -20,19 +20,16 @@ Mesh::Mesh(Vertex* vertices, unsigned int numVertices, unsigned int* indices, un
 	glBindVertexArray(m_VAO);
 
 	glGenBuffers(NUM_BUFFERS, m_VBO);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO[POSITION_VB]);
 	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(positions[0]), &positions[0], GL_STATIC_DRAW);
-
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	// glBindVertexArray(0);
-	// glBindVertexArray(m_VAO);
 
-	// glBindBuffer(GL_ARRAY_BUFFER, m_VBO[TEX_COORD_VB]);
-	// glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(texCoor[0]), &texCoor[0], GL_STATIC_DRAW);
-
-	// glEnableVertexAttribArray(1);
-	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO[TEX_COORD_VB]);
+	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(texCoor[0]), &texCoor[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VBO[INDEX_VB]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(indices[0]), &indices[0], GL_STATIC_DRAW);

@@ -32,7 +32,7 @@ private:
 
     enum {
         POSITION_VB,
-        // TEX_COORD_VB,
+        TEX_COORD_VB,
         INDEX_VB,
         NUM_BUFFERS,
     };
