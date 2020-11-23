@@ -113,8 +113,11 @@ int main(int argc, char *argv[])
         for (int j = 0; j < xSize; j += 100) {
             double xCoord = xOrigin + (xDelta * j);
             double yCoord = yOrigin + (yDelta * i);
+            // TODO calculation of tex coordinates should be apstracted away
+            double s = (xCoord - 14.6667) / 2.6666;
+            double t = (yCoord - 45.0) / 2.0;
             double height = pafScanline[j] / 1000.0;
-            Vertex vex(glm::vec3(xCoord, yCoord, height), glm::vec2(0.0, 0.0));
+            Vertex vex(glm::vec3(xCoord, yCoord, height), glm::vec2(s, t));
             // std::cout << "h: " << pafScanline[j] << std::endl;
             dtmVertices.push_back(vex);
         }
@@ -143,7 +146,7 @@ int main(int argc, char *argv[])
             std::cout << "Second triang: " << first << " " << third << " " << fourth << std::endl;
         }
     }
-    Mesh dtmMesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_LINE_STRIP);
+    Mesh dtmMesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
 
 
     std::vector<Vertex> polygon = polygons[0];
@@ -196,9 +199,9 @@ int main(int argc, char *argv[])
         }
         shader.UpdateTransform(transform, camera);
         mesh.Draw();
-        dtmMesh.Draw();
         tex.Bind(0);
-        wmsMesh.Draw();
+        dtmMesh.Draw();
+        // wmsMesh.Draw();
 
         dis.Update();
     }
