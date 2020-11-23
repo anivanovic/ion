@@ -27,6 +27,10 @@ public:
         m_position = m_position + move;
     }
 
+    void rotate (glm::vec3 direction) {
+        m_forward = direction;
+    }
+
 private:
     glm::mat4 m_perspective;
     glm::vec3 m_position;
