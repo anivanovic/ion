@@ -5,6 +5,7 @@
 Texture::Texture(const std::string& fileName)
 {
     int width, height, numComponents;
+    stbi_set_flip_vertically_on_load(true);
     stbi_uc* texture = stbi_load(fileName.c_str(), &width, &height, &numComponents, 4);
 
     if (texture == NULL) {
@@ -13,8 +14,8 @@ Texture::Texture(const std::string& fileName)
 
     glGenTextures(1, &m_texture);
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
