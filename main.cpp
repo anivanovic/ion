@@ -109,41 +109,42 @@ int main(int argc, char *argv[])
         band->RasterIO(GF_Read, 0, i, xSize, 1,
             pafScanline, xSize, 1, GDT_Float32,
             0, 0);
+        double yCoord = yOrigin + (yDelta * i);
+        double t = (yCoord - 45.0) / 2.0;
 
         for (int j = 0; j < xSize; j += 100) {
             double xCoord = xOrigin + (xDelta * j);
-            double yCoord = yOrigin + (yDelta * i);
             // TODO calculation of tex coordinates should be apstracted away
             double s = (xCoord - 14.6667) / 2.6666;
-            double t = (yCoord - 45.0) / 2.0;
-            double height = pafScanline[j] / 1000.0;
+            // 0.00001 is ratio of one wgs degree to metars (1/108000)
+            // We transform heights in metars to degrese here.
+            double height = pafScanline[j] * 0.00001;
             Vertex vex(glm::vec3(xCoord, yCoord, height), glm::vec2(s, t));
-            // std::cout << "h: " << pafScanline[j] << std::endl;
             dtmVertices.push_back(vex);
         }
     }
 
-
     std::vector<unsigned int> dtmIndices;
     for (int i = 0; i < (ySize / 100); i++) {
-        std::cout << "i: " << i << std::endl;
         for (int j = 0; j < (xSize / 100) - 1; j++) {
-            std::cout << "j: " << j << std::endl;
-            int xOffset = (i * (xSize / 100)) + j;
+            int rowSize = (xSize / 100) + 1;
+            int xOffset = (i * rowSize) + j;
 
             int first = xOffset;
-            int second = xOffset + (xSize / 100);
-            int third = xOffset + (xSize / 100) + 1;
-            int fourth = xOffset + 1;
+            int second = xOffset + rowSize;
+            int third = xOffset + 1;
+            int fourth = xOffset + rowSize + 1;
 
-            dtmIndices.push_back(first);
-            dtmIndices.push_back(second);
-            dtmIndices.push_back(third);
-            dtmIndices.push_back(first);
-            dtmIndices.push_back(third);
-            dtmIndices.push_back(fourth);
-            std::cout << "First triang: " << first << " " << second << " " << third << std::endl;
-            std::cout << "Second triang: " << first << " " << third << " " << fourth << std::endl;
+            #define push(x) if (x >= dtmVertices.size()) std::cout << "Pushing indx out of bound " << x << std::endl; dtmIndices.push_back(x);
+            push(first);
+            push(second);
+            push(third);
+            push(third);
+            push(second);
+            push(fourth);
+            std::cout << "first triag " << first << " " << second << " " << third << std::endl;
+            std::cout << "second triag " << first << " " << third << " " << fourth << std::endl;
+            #undef push;
         }
     }
     Mesh dtmMesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
@@ -162,28 +163,16 @@ int main(int argc, char *argv[])
         indices[i] = i;
     }
     Mesh mesh(&polygon[0], polygon.size(), indices, sizeof(indices)/sizeof(indices[0]), GL_LINE_STRIP);
-
-    Vertex vertices[] = {
-        Vertex(glm::vec3(14.6667, 45.0, 0), glm::vec2(0.0, 0.0)),
-        Vertex(glm::vec3(17.3333, 45.0, 0), glm::vec2(1.0, 0.0)),
-        Vertex(glm::vec3(17.3333, 47.0, 0), glm::vec2(1.0, 1.0)),
-        Vertex(glm::vec3(14.6667, 47.0, 0), glm::vec2(0.0, 1.0)),
-    };
-    unsigned int indices2[] = {0, 1, 2, 2, 3, 0};
-    Mesh wmsMesh(vertices, sizeof(vertices)/sizeof(vertices[0]), indices2, sizeof(indices2)/sizeof(indices2[0]), GL_TRIANGLES);
     Shader shader("./res/basicShader");
 
-    Texture tex("./res/wms.png");
+    Texture tex("./res/wms2.png");
     Transform transform;
-    Camera camera(&dis, glm::vec3(16, 46, 4), 0.01, 100.0);
+    Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
 
     transform.GetScale() = glm::vec3(1, 1, 1);
     while (!dis.isClosed())
     {
         dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
-
-        shader.Bind();
-        tex.Bind(0);
         if (Mouse::get()->isActive())
         {
             // TODO put in method code to converting to world coord
@@ -197,12 +186,11 @@ int main(int argc, char *argv[])
                 camera.move(change);
             }
         }
+        shader.Bind();
         shader.UpdateTransform(transform, camera);
         mesh.Draw();
         tex.Bind(0);
         dtmMesh.Draw();
-        // wmsMesh.Draw();
-
         dis.Update();
     }
     return 0;

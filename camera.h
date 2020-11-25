@@ -13,7 +13,8 @@ public:
         double aspectRatio = dis->AspectRatio();
         std::cout << "w: " << dis->Width() << "h: " << dis->Height() <<std::endl;
         std::cout << "aspect ration: " << aspectRatio << std::endl;
-        m_perspective = glm::ortho(-aspectRatio, aspectRatio, -1.0, 1.0, zNear, zFar);
+        // m_perspective = glm::ortho(-aspectRatio, aspectRatio, -1.0, 1.0, zNear, zFar);
+        m_perspective = glm::perspective(70.0, aspectRatio, zNear, zFar);
         m_position = pos;
         m_forward = glm::vec3(0, 0, -1);
         m_up = glm::vec3(0, 1, 0);
