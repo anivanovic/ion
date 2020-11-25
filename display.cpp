@@ -62,6 +62,7 @@ void Display::Update()
     SDL_GL_SwapWindow(m_window);
 
     SDL_Event e;
+    Mouse::get()->reset();
     while (SDL_PollEvent(&e))
     {
         switch (e.type)
@@ -72,7 +73,8 @@ void Display::Update()
         case SDL_MOUSEMOTION:
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
-            Mouse::get()->setEvent(&e);
+        case SDL_MOUSEWHEEL:
+            Mouse::get()->setEvent(e);
             break;
         case SDL_KEYDOWN:
             if (e.key.keysym.sym == SDLK_LCTRL) {

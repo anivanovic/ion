@@ -32,6 +32,10 @@ public:
         m_forward = direction;
     }
 
+    void zoom(float zoom) {
+        m_position += (m_forward * zoom);
+    }
+
 private:
     glm::mat4 m_perspective;
     glm::vec3 m_position;

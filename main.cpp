@@ -142,8 +142,6 @@ int main(int argc, char *argv[])
             push(third);
             push(second);
             push(fourth);
-            std::cout << "first triag " << first << " " << second << " " << third << std::endl;
-            std::cout << "second triag " << first << " " << third << " " << fourth << std::endl;
             #undef push;
         }
     }
@@ -173,18 +171,18 @@ int main(int argc, char *argv[])
     while (!dis.isClosed())
     {
         dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
-        if (Mouse::get()->isActive())
-        {
-            // TODO put in method code to converting to world coord
+        // TODO put in method code to converting to world coord
+        glm::vec3 change = Mouse::get()->getMove();
+        if (Mouse::get()->isRotation()) {
+            camera.rotate(change);
+        } else if (Mouse::get()->isZooming()) {
+            camera.zoom(change.x);
+        } else if (Mouse::get()->isMove()) {
+            double xDelta = 2.0 / 1600.0;
+            double yDelta = 2.0 / 1200.0;
             glm::vec3 change = Mouse::get()->getMove();
-            if (Mouse::get()->isRotation()) {
-                camera.rotate(change);
-            } else {
-                double xDelta = 2.0 / 1600.0;
-                double yDelta = 2.0 / 1200.0;
-                change = glm::vec3(-xDelta, yDelta, 0) * change;
-                camera.move(change);
-            }
+            change = glm::vec3(-xDelta, yDelta, 0) * change;
+            camera.move(change);
         }
         shader.Bind();
         shader.UpdateTransform(transform, camera);
