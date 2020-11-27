@@ -8,6 +8,9 @@
 #include <ogrsf_frmts.h>
 #include <iostream>
 #include <curl/curl.h>
+#include <filesystem>
+
+namespace fs = std::__fs::filesystem;
 
 std::vector<std::vector<Vertex>> parseMulty(OGRMultiPolygon *multy)
 {
@@ -69,18 +72,8 @@ std::vector<std::vector<Vertex>> readShape()
     return points;
 }
 
-int main(int argc, char *argv[])
-{
-    Display dis(800, 600, "Test one");
-
-    int nrAttributes;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
-    std::cout << "GL version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GPU used: " << glGetString(GL_VENDOR) << " - " << glGetString(GL_RENDERER) << std::endl;
-
-    std::vector<std::vector<Vertex>> polygons = readShape();
-    GDALDataset* poDataset = (GDALDataset *) GDALOpen("./res/dem/N46E016.hgt", GA_ReadOnly);
+Mesh* constructMesh(std::string filepath) {
+    GDALDataset* poDataset = (GDALDataset *) GDALOpen(filepath.c_str(), GA_ReadOnly);
     std::cout << poDataset->GetDriver()->GetDescription() << std::endl;
     std::cout << "Number of bands: " << poDataset->GetBands().size() << std::endl;
     std::cout << "Pixel width: " << poDataset->GetRasterXSize() << ", height: " << poDataset->GetRasterYSize() << std::endl;
@@ -145,9 +138,22 @@ int main(int argc, char *argv[])
             #undef push;
         }
     }
-    Mesh dtmMesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
+    
+    CPLFree(pafScanline);
+    return new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
+}
 
+int main(int argc, char *argv[])
+{
+    Display dis(800, 600, "Test one");
 
+    int nrAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+    std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+    std::cout << "GL version: " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GPU used: " << glGetString(GL_VENDOR) << " - " << glGetString(GL_RENDERER) << std::endl;
+
+    std::vector<std::vector<Vertex>> polygons = readShape();
     std::vector<Vertex> polygon = polygons[0];
     for (auto poly : polygons)
     {
@@ -166,8 +172,11 @@ int main(int argc, char *argv[])
     Texture tex("./res/wms2.png");
     Transform transform;
     Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
+    std::vector<Mesh*> dtms;
+    for (const auto& entry : fs::directory_iterator("./res/dem")) {
+        dtms.push_back(constructMesh(entry.path()));
+    }
 
-    transform.GetScale() = glm::vec3(1, 1, 1);
     while (!dis.isClosed())
     {
         dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
@@ -188,8 +197,15 @@ int main(int argc, char *argv[])
         shader.UpdateTransform(transform, camera);
         mesh.Draw();
         tex.Bind(0);
-        dtmMesh.Draw();
+        for (Mesh* dtm : dtms) {
+            dtm->Draw();
+        }
         dis.Update();
     }
+
+    for (Mesh* dtm : dtms) {
+        delete dtm;
+    }
+
     return 0;
 }
