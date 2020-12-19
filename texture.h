@@ -7,10 +7,9 @@
 class Texture
 {
 private:
+    GLuint m_texture;
     Texture(const Texture& other) {}
     void operator =(const Texture& other) {}
-
-    GLuint m_texture;
 public:
     Texture(const std::string& fileName);
     ~Texture();

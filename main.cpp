@@ -9,6 +9,7 @@
 #include <iostream>
 #include <curl/curl.h>
 #include <filesystem>
+#include <utility>
 
 namespace fs = std::__fs::filesystem;
 
@@ -72,17 +73,10 @@ std::vector<std::vector<Vertex>> readShape()
     return points;
 }
 
-Mesh* constructMesh(std::string filepath) {
+std::pair<Mesh*, Texture*> constructMesh(fs::path filepath) {
     GDALDataset* poDataset = (GDALDataset *) GDALOpen(filepath.c_str(), GA_ReadOnly);
-    std::cout << poDataset->GetDriver()->GetDescription() << std::endl;
-    std::cout << "Number of bands: " << poDataset->GetBands().size() << std::endl;
-    std::cout << "Pixel width: " << poDataset->GetRasterXSize() << ", height: " << poDataset->GetRasterYSize() << std::endl;
-    std::cout << "Projectio is: " << poDataset->GetProjectionRef() << std::endl;
     double afin[6];
     poDataset->GetGeoTransform(afin);
-    #define print(a) a << ", "
-    std::cout << print(afin[0]) << print(afin[1]) << print(afin[2]) << print(afin[3]) << print(afin[4]) << print(afin[5]) << std::endl;
-    #undef print
 
     double xOrigin = afin[0];
     double yOrigin = afin[3];
@@ -90,12 +84,11 @@ Mesh* constructMesh(std::string filepath) {
     double yDelta = afin[5];
 
     GDALRasterBand* band = poDataset->GetRasterBand(1);
-    int nBlockXSize, nBlockYSize;
-    band->GetBlockSize(&nBlockXSize, &nBlockYSize);
     int xSize = band->GetXSize();
     int ySize = band->GetYSize();
-    std::cout << "x size " << xSize << ", y size " << ySize << std::endl;
     float* pafScanline = (float *) CPLMalloc(sizeof(float) * xSize);
+    double xEnd = (xSize - 1) * xDelta + xOrigin;
+    double yEnd = (ySize - 1) * yDelta + yOrigin;
 
     std::vector<Vertex> dtmVertices;
     for (int i = 0; i < ySize; i += 100) {
@@ -103,15 +96,15 @@ Mesh* constructMesh(std::string filepath) {
             pafScanline, xSize, 1, GDT_Float32,
             0, 0);
         double yCoord = yOrigin + (yDelta * i);
-        double t = (yCoord - 45.0) / 2.0;
+        double t = (yCoord - yEnd) / std::abs((ySize - 1) * yDelta);
 
         for (int j = 0; j < xSize; j += 100) {
             double xCoord = xOrigin + (xDelta * j);
-            // TODO calculation of tex coordinates should be apstracted away
-            double s = (xCoord - 14.6667) / 2.6666;
+            // TODO calculation of tex coordinates should be abstracted away
+            double s = (xCoord - xOrigin) / ((xSize - 1) * xDelta);
             // 0.00001 is ratio of one wgs degree to metars (1/108000)
             // We transform heights in metars to degrese here.
-            double height = pafScanline[j] * 0.00001;
+            double height = pafScanline[j] * 0.00009;
             Vertex vex(glm::vec3(xCoord, yCoord, height), glm::vec2(s, t));
             dtmVertices.push_back(vex);
         }
@@ -119,7 +112,7 @@ Mesh* constructMesh(std::string filepath) {
 
     std::vector<unsigned int> dtmIndices;
     for (int i = 0; i < (ySize / 100); i++) {
-        for (int j = 0; j < (xSize / 100) - 1; j++) {
+        for (int j = 0; j < (xSize / 100); j++) {
             int rowSize = (xSize / 100) + 1;
             int xOffset = (i * rowSize) + j;
 
@@ -139,8 +132,17 @@ Mesh* constructMesh(std::string filepath) {
         }
     }
     
+
     CPLFree(pafScanline);
-    return new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
+    std::string filename = filepath.filename();
+    // remove file extension
+    int lastIndex = filename.find_last_of(".");
+    filename = filename.substr(0, lastIndex);
+    fs::path wmsFolder = filepath.parent_path().parent_path().append("wms");
+    std::string texturePath = wmsFolder.append(filename + ".png");
+    Texture* tex = new Texture(texturePath);
+    Mesh* mesh = new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0], dtmIndices.size(), GL_TRIANGLES);
+    return std::make_pair(mesh, tex);
 }
 
 int main(int argc, char *argv[])
@@ -169,14 +171,15 @@ int main(int argc, char *argv[])
     Mesh mesh(&polygon[0], polygon.size(), indices, sizeof(indices)/sizeof(indices[0]), GL_LINE_STRIP);
     Shader shader("./res/basicShader");
 
-    Texture tex("./res/wms2.png");
+    // Texture tex("./res/wms2.png");
     Transform transform;
     Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
-    std::vector<Mesh*> dtms;
+    std::vector<std::pair<Mesh*, Texture*>> dtms;
     for (const auto& entry : fs::directory_iterator("./res/dem")) {
         dtms.push_back(constructMesh(entry.path()));
     }
 
+    shader.Bind();
     while (!dis.isClosed())
     {
         dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
@@ -193,18 +196,13 @@ int main(int argc, char *argv[])
             change = glm::vec3(-xDelta, yDelta, 0) * change;
             camera.move(change);
         }
-        shader.Bind();
         shader.UpdateTransform(transform, camera);
         mesh.Draw();
-        tex.Bind(0);
-        for (Mesh* dtm : dtms) {
-            dtm->Draw();
+        for (std::vector<std::pair<Mesh*, Texture*>>::const_iterator it = dtms.begin(); it != dtms.end(); it++) {
+            it->second->Bind(0);
+            it->first->Draw();
         }
         dis.Update();
-    }
-
-    for (Mesh* dtm : dtms) {
-        delete dtm;
     }
 
     return 0;
