@@ -2,6 +2,7 @@
 #define CAMERA_H_INCLUDED
 
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/transform.hpp>
 #include "display.h"
 #include <iostream>
@@ -25,11 +26,18 @@ public:
     }
 
     void move(glm::vec3 move) {
-        m_position = m_position + move;
+        m_position += move;
     }
 
     void rotate (glm::vec3 direction) {
-        m_forward = direction;
+	float x_rad = direction.x;
+	float y_rad = direction.y;
+
+	glm::vec3 right = glm::normalize(glm::cross(m_forward, m_up));
+	glm::mat4 x_rot = glm::rotate(x_rad, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 y_rot = glm::rotate(y_rad, right); 
+	m_forward = glm::normalize(x_rot * y_rot * glm::vec4(m_forward, 0.0f));
+        m_up = glm::normalize(x_rot * y_rot * glm::vec4(m_up, 0.0f));
     }
 
     void zoom(float zoom) {

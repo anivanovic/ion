@@ -52,20 +52,11 @@ glm::vec3 Mouse::getMove() {
         _x *= SENSITIVITY;
         _y *= -SENSITIVITY;
 
-        m_yaw += _x;
-        m_pitch += _y;
+        m_yaw -= _x;
+        m_pitch -= _y;
 
-        if (m_pitch > 89.0) m_pitch = 89.0;
-        if (m_pitch < -89.0) m_pitch = -89.0;
-        if (m_yaw > 180.0) m_yaw = 180.0;
-        if (m_yaw < -180.0) m_yaw = -180.0;
-
-        glm::vec3 direction;
-        direction.x = glm::cos(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
-        direction.y = glm::sin(glm::radians(m_pitch));
-        direction.z = glm::sin(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
-        direction = glm::normalize(direction);
-        return direction;
+	float x_rad = glm::radians(_x), y_rad = glm::radians(_y);
+        return glm::vec3(x_rad, y_rad, 0.0f);
     } else if (isZooming()) {
         return glm::vec3(zoom(), 0.0, 0.0);
     }
