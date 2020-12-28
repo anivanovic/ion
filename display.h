@@ -1,32 +1,33 @@
 #ifndef DISPLAY_INCLUDED_H
 #define DISPLAY_INCLUDED_H
 
-#include <string>
 #include <SDL2/SDL.h>
 
-class Display
-{
-public:
-	Display(int width, int height, const std::string& title);
+#include <string>
 
-	void Clear(float r, float g, float b, float a);
-	void Update();
-    bool isClosed();
-	int Height();
-	int Width();
-	double AspectRatio();
+class Display {
+ public:
+  Display(int width, int height, const std::string& title);
 
-	virtual ~Display();
-protected:
-private:
-	void operator=(const Display& display) {}
-	Display(const Display& display) {}
+  void Clear(float r, float g, float b, float a);
+  void Update();
+  bool isClosed();
+  int Height();
+  int Width();
+  double AspectRatio();
 
-	SDL_Window* m_window;
-	SDL_GLContext m_glContext;
-    bool m_isClosed;
+  virtual ~Display();
 
-	int m_width, m_height;
+ protected:
+ private:
+  void operator=(const Display& display) {}
+  Display(const Display& display) {}
+
+  SDL_Window* m_window;
+  SDL_GLContext m_glContext;
+  bool m_isClosed;
+
+  int m_width, m_height;
 };
 
 #endif
