@@ -15,6 +15,8 @@
 
 namespace fs = std::__fs::filesystem;
 
+typedef std::pair<std::unique_ptr<Mesh>, std::unique_ptr<Texture>> TexturedMesh;
+
 std::vector<std::vector<Vertex>> parseMulty(OGRMultiPolygon *multy) {
   int nGeoms = multy->getNumGeometries();
   std::vector<std::vector<Vertex>> layers;
@@ -71,7 +73,7 @@ std::vector<std::vector<Vertex>> readShape() {
   return points;
 }
 
-std::pair<Mesh *, Texture *> constructMesh(fs::path filepath) {
+TexturedMesh constructMesh(fs::path filepath) {
   GDALDataset *poDataset =
       (GDALDataset *)GDALOpen(filepath.c_str(), GA_ReadOnly);
   double afin[6];
@@ -140,10 +142,10 @@ std::pair<Mesh *, Texture *> constructMesh(fs::path filepath) {
   filename = filename.substr(0, lastIndex);
   fs::path wmsFolder = filepath.parent_path().parent_path().append("wms");
   std::string texturePath = wmsFolder.append(filename + ".png");
-  Texture *tex = new Texture(texturePath);
-  Mesh *mesh = new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0],
-                        dtmIndices.size(), GL_TRIANGLES);
-  return std::make_pair(mesh, tex);
+  std::unique_ptr<Texture> tex(new Texture(texturePath));
+  std::unique_ptr<Mesh> mesh(new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0],
+                        dtmIndices.size(), GL_TRIANGLES));
+  return std::make_pair(std::move(mesh), std::move(tex));
 }
 
 int main(int argc, char *argv[]) {
@@ -175,7 +177,7 @@ int main(int argc, char *argv[]) {
   // Texture tex("./res/wms2.png");
   Transform transform;
   Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
-  std::vector<std::pair<Mesh *, Texture *>> dtms;
+  std::vector<TexturedMesh> dtms;
   for (const auto &entry : fs::directory_iterator("./res/dem")) {
     dtms.push_back(constructMesh(entry.path()));
   }
@@ -198,7 +200,7 @@ int main(int argc, char *argv[]) {
     }
     shader.UpdateTransform(transform, camera);
     mesh.Draw();
-    for (std::vector<std::pair<Mesh *, Texture *>>::const_iterator it =
+    for (std::vector<TexturedMesh>::const_iterator it =
              dtms.begin();
          it != dtms.end(); it++) {
       it->second->Bind(0);
