@@ -143,8 +143,9 @@ TexturedMesh constructMesh(fs::path filepath) {
   fs::path wmsFolder = filepath.parent_path().parent_path().append("wms");
   std::string texturePath = wmsFolder.append(filename + ".png");
   std::unique_ptr<Texture> tex(new Texture(texturePath));
-  std::unique_ptr<Mesh> mesh(new Mesh(&dtmVertices[0], dtmVertices.size(), &dtmIndices[0],
-                        dtmIndices.size(), GL_TRIANGLES));
+  std::unique_ptr<Mesh> mesh(new Mesh(&dtmVertices[0], dtmVertices.size(),
+                                      &dtmIndices[0], dtmIndices.size(),
+                                      GL_TRIANGLES));
   return std::make_pair(std::move(mesh), std::move(tex));
 }
 
@@ -200,8 +201,7 @@ int main(int argc, char *argv[]) {
     }
     shader.UpdateTransform(transform, camera);
     mesh.Draw();
-    for (std::vector<TexturedMesh>::const_iterator it =
-             dtms.begin();
+    for (std::vector<TexturedMesh>::const_iterator it = dtms.begin();
          it != dtms.end(); it++) {
       it->second->Bind(0);
       it->first->Draw();
