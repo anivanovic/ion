@@ -12,17 +12,17 @@
 #include "transform.h"
 #include "geometry.h"
 
-int main(int argc, char *argv[]) {
-  Display dis(800, 600, "Test one");
-
+static void printGLInfo() {
   int nrAttributes;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-  std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes
-            << std::endl;
   std::cout << "GL version: " << glGetString(GL_VERSION) << std::endl;
   std::cout << "GPU used: " << glGetString(GL_VENDOR) << " - "
             << glGetString(GL_RENDERER) << std::endl;
+  std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes
+            << std::endl;
+}
 
+static std::unique_ptr<Mesh> constructStateBorder() {
   std::vector<std::vector<Vertex>> polygons =
       readShapefile("res/croatia/CROATIA_HR_Država_ADMIN0.shp");
   std::vector<Vertex> polygon = polygons[0];
@@ -35,19 +35,26 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < polygon.size(); i++) {
     indices[i] = i;
   }
-  Mesh mesh(&polygon[0], polygon.size(), indices,
-            sizeof(indices) / sizeof(indices[0]), GL_LINE_STRIP);
-  Shader shader("./res/basicShader");
+  std::unique_ptr<Mesh> mesh(new Mesh(&polygon[0], polygon.size(), indices,
+                                      sizeof(indices) / sizeof(indices[0]),
+                                      GL_LINE_STRIP));
+  return mesh;
+}
 
-  // Texture tex("./res/wms2.png");
+int main(int argc, char *argv[]) {
+  Display dis(800, 600, "Test one");
+  printGLInfo();
+
+  Shader shader("./res/basicShader");
   Transform transform;
   Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
+  shader.Bind();
+
+  std::unique_ptr<Mesh> mesh = constructStateBorder();
   std::vector<TexturedMesh> dtms;
   for (const auto &entry : fs::directory_iterator("./res/dem")) {
     dtms.push_back(constructMesh(entry.path()));
   }
-
-  shader.Bind();
   while (!dis.isClosed()) {
     dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
     // TODO put in method code to converting to world coord
@@ -64,7 +71,8 @@ int main(int argc, char *argv[]) {
       camera.move(change);
     }
     shader.UpdateTransform(transform, camera);
-    mesh.Draw();
+
+    mesh->Draw();
     for (std::vector<TexturedMesh>::const_iterator it = dtms.begin();
          it != dtms.end(); it++) {
       it->second->Bind(0);
