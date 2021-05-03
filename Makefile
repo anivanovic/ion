@@ -6,7 +6,7 @@ LIBS=$$(sdl2-config --libs) $$(gdal-config --libs)
 $(TARGET): main.o display.o Mesh.o shader.o texture.o Mouse.o stb_image.o
 	$(CC) $(CFLAGS) $^ -o $(TARGET) $(LIBS)
 
-main.o: main.cpp display.o Mesh.o shader.o texture.o Mouse.o stb_image.o camera.h transform.h Makefile
+main.o: main.cpp display.o Mesh.o shader.o texture.o Mouse.o stb_image.o camera.h transform.h geometry.h Makefile
 	$(CC) $(CFLAGS) -c main.cpp
 
 Mouse.o: Mouse.cpp Makefile
