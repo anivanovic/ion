@@ -50,11 +50,13 @@ int main(int argc, char *argv[]) {
   Camera camera(&dis, glm::vec3(16, 46, 1.5), 0.01, 100.0);
   shader.Bind();
 
+  GDALInit();
   std::unique_ptr<Mesh> mesh = constructStateBorder();
   std::vector<TexturedMesh> dtms;
   for (const auto &entry : fs::directory_iterator("./res/dem")) {
     dtms.push_back(constructMesh(entry.path()));
   }
+
   while (!dis.isClosed()) {
     dis.Clear(1.0f, 1.0f, 1.0f, 1.0f);
     // TODO put in method code to converting to world coord

@@ -12,6 +12,8 @@ namespace fs = std::__fs::filesystem;
 
 typedef std::pair<std::unique_ptr<Mesh>, std::unique_ptr<Texture>> TexturedMesh;
 
+static void GDALInit() { GDALAllRegister(); }
+
 std::vector<std::vector<Vertex>> parseMultyPoligon(OGRMultiPolygon *multy) {
   int nGeoms = multy->getNumGeometries();
   std::vector<std::vector<Vertex>> layers;
@@ -37,7 +39,6 @@ std::vector<std::vector<Vertex>> parseMultyPoligon(OGRMultiPolygon *multy) {
 }
 
 std::vector<std::vector<Vertex>> readShapefile(const std::string &filepath) {
-  GDALAllRegister();
   GDALDataset *poDS = (GDALDataset *)GDALOpenEx(
       filepath.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 
