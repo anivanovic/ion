@@ -37,7 +37,7 @@ void Shader::UpdateTransform(const Transform& transform, const Camera& camera) {
 
 std::string Shader::LoadShader(const std::string& file_name) {
   std::ifstream file;
-  file.open((file_name).c_str());
+  file.open(file_name.c_str());
 
   std::string output;
   std::string line;
@@ -47,9 +47,9 @@ std::string Shader::LoadShader(const std::string& file_name) {
       getline(file, line);
       output.append(line + "\n");
     }
-  } else {
-    std::cerr << "Unable to load shader: " << file_name << std::endl;
-  }
+      } else {
+        std::cerr << "Unable to load shader: " << file_name << std::endl;
+      }
 
   return output;
 }

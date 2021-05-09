@@ -1,4 +1,4 @@
 quant
 res
 .vscode
-*.o
+build
