@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+#pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -45,5 +44,3 @@ class Transform {
   inline void SetRot(glm::vec3& rot) { m_rot = rot; }
   inline void SetScale(glm::vec3& scale) { m_scale = scale; }
 };
-
-#endif

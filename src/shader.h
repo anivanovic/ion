@@ -1,5 +1,4 @@
-#ifndef _SHADER_INCLUDES_H_
-#define _SHADER_INCLUDES_H_
+#pragma once
 
 #include <OpenGL/gl3.h>
 
@@ -30,5 +29,3 @@ class Shader {
   GLuint m_shaders[2];
   GLuint m_uniforms[NUM_UNIFORMS];
 };
-
-#endif

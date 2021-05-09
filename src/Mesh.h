@@ -1,5 +1,4 @@
-#ifndef _MESH_INCLUDED_H_
-#define _MESH_INCLUDED_H_
+#pragma once
 
 #include <OpenGL/gl3.h>
 
@@ -46,5 +45,3 @@ class Mesh {
   unsigned int m_drawCount;
   GLenum m_mode;
 };
-
-#endif

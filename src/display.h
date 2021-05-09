@@ -1,5 +1,4 @@
-#ifndef DISPLAY_INCLUDED_H
-#define DISPLAY_INCLUDED_H
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -29,5 +28,3 @@ class Display {
 
   int m_width, m_height;
 };
-
-#endif

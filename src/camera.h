@@ -1,5 +1,4 @@
-#ifndef CAMERA_H_INCLUDED
-#define CAMERA_H_INCLUDED
+#pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -55,5 +54,3 @@ struct Camera {
   glm::vec3 m_up;
   glm::vec3 m_right;
 };
-
-#endif

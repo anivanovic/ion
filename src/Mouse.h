@@ -1,5 +1,4 @@
-#ifndef __MOUSE_H__
-#define __MOUSE_H__
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -29,5 +28,3 @@ class Mouse {
   void reset();
   static Mouse* get();
 };
-
-#endif

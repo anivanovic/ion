@@ -1,5 +1,4 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include <OpenGL/gl3.h>
 
@@ -17,5 +16,3 @@ class Texture {
 
   void Bind(unsigned int unit);
 };
-
-#endif
