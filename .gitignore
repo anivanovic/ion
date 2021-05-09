@@ -2,3 +2,5 @@ quant
 res
 .vscode
 build
+# ignore built exe
+ion
