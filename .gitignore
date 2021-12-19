@@ -1,6 +1,7 @@
-quant
-res
-.vscode
 build
-# ignore built exe
+.*
+!.gitignore
+
+# ignore built library and executable
 ion
+quant
