@@ -126,7 +126,7 @@ TexturedMesh constructMesh(fs::path filepath) {
       push(third);
       push(second);
       push(fourth);
-#undef push;
+#undef push
     }
   }
 

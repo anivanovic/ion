@@ -1,0 +1,10 @@
+{
+  "name": "quant",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "gdal",
+    "sdl2",
+    "opengl",
+    "glm"
+  ]
+}
