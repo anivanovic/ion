@@ -1,8 +1,8 @@
-## Ion
+# Ion
 
 Ion is a 3D viewer for spatial data. It in early stage and a lot of things are missing. I am using it mostly for learning C++ and computer graphics.
 
-# Setup
+## Setup
 
 Project uses Vcpkg to manage dependencies and CMake to build it. Please install CMake 3.20 or higher and Vcpkg. Currently only MacOS is supported. Other platforms have not be tested.
 
